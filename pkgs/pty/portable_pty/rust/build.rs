@@ -16,4 +16,10 @@ This header is designed to be consumed by ffigen over on the Dart side.
         .generate()
         .expect("Unable to generate bindings")
         .write_to_file("bindings.h");
+
+    // Force 16 KB ELF page alignment on Android (Android 15 / Play gate); rides with the crate so source builds get it too. https://developer.android.com/guide/practices/page-sizes
+    if env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("android") {
+        println!("cargo::rustc-link-arg-cdylib=-Wl,-z,max-page-size=16384");
+        println!("cargo::rustc-link-arg-cdylib=-Wl,-z,common-page-size=16384");
+    }
 }
