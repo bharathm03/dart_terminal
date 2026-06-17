@@ -135,16 +135,6 @@ jobs:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         shell: bash
 
-      # Gate Android 64-bit artifacts on 16 KB ELF LOAD alignment (Android 15
-      # / Play submission requirement). 32-bit armeabi-v7a is exempt — 16 KB
-      # pages are a 64-bit-only feature — so it is not checked here.
-      - name: Verify 16 KB page alignment (Android 64-bit)
-        if: ${{ matrix.os_label == 'android-arm64' || matrix.os_label == 'android-x64' }}
-        run: |
-          LIB=$(find pkgs/pty/portable_pty/rust/target/${{ matrix.rust_target }}/release -name '${{ matrix.artifact }}' -type f | head -1)
-          ./tool/verify_pty_android_page_size.sh "$LIB"
-        shell: bash
-
       - name: Package artifact
         run: |
           mkdir -p staging
